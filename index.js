@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const cors = require('cors');
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion ,ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000
 // middle
 app.use(cors())
@@ -31,10 +31,17 @@ async function run(){
       res.send(tools)
      })
 
-     // tools add product
+     // post tools add product
      app.post('/tools' ,async(req,res)=>{
       const tools = req.body
       const result = await toolsCollection .insertOne(tools)
+      res.send(result)
+    })
+     // delete tools add product
+     app.delete('/tools/:id' ,async(req,res)=>{
+      const id = req.params.id
+      const query = {_id: ObjectId(id)}
+      const result = await toolsCollection .deleteOne(query)
       res.send(result)
     })
      // post review part start
