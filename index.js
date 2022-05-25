@@ -3,6 +3,7 @@ const app = express()
 const cors = require('cors');
 const jwt = require ('jsonwebtoken');
 require('dotenv').config()
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { MongoClient, ServerApiVersion ,ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000
 // middle
@@ -102,8 +103,28 @@ async function run(){
       const orderEmail = await cursor.toArray()
       res.send(orderEmail)
       })
+    // get order payment by id 
+    app.get('/orderPayment/:id',verifyJwt ,async(req ,res)=>{
+      const id = req.params.id;
+      const query ={_id: ObjectId(id)}
+      const orderPayment = await orderCollection.findOne(query)
+      res.send(orderPayment)
+    })
+
+    // order payment
+    // app.post('/create-payment-intent', verifyJwt , async(req, res) =>{
+    //   const orderPrice = req.body;
+    //   const totalPrice = orderPrice.totalPrice;
+    //   const amount = totalPrice*100;
+    //   const paymentIntent = await stripe.paymentIntents.create({
+    //     amount : amount,
+    //     currency: 'usd',
+    //     payment_method_types:['card']
+    //   });
+    //   res.send({clientSecret: paymentIntent.client_secret})
+    // });
      // post review part start
-     app.post('/review' ,async(req,res)=>{
+     app.post('/review',async(req,res)=>{
       const tools = req.body
       const result = await reviewCollection .insertOne(tools)
       res.send(result)
@@ -174,7 +195,7 @@ async function run(){
         // res.send(filter)
         const updateDoc ={
             $set:{
-              minimumQuantity:quantityIncrease.quantity
+              quantity:quantityIncrease.quantity
                 // quantityIncrease
             }
         }
