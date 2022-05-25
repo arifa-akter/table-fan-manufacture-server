@@ -37,6 +37,10 @@ async function run(){
     const userCollection = client.db('table_fan').collection('users')
     //  table user collection
     const reviewCollection = client.db('table_fan').collection('review')
+    //  table user collection
+    const orderCollection = client.db('table_fan').collection('order')
+    //  table user collection
+    const profileCollection = client.db('table_fan').collection('profile')
     //  admin verify
      const verifyAdmin = async (req,res ,next) =>{
       const requester = req.decoded.email 
@@ -70,6 +74,34 @@ async function run(){
       const result = await toolsCollection .deleteOne(query)
       res.send(result)
     })
+    // my profile
+    app.post('/profile' ,async(req,res)=>{
+      const profiles = req.body
+      const result = await profileCollection .insertOne(profiles)
+      res.send(result)
+    })
+    // put  order all information
+    app.post('/order' ,async(req,res)=>{
+      const order = req.body
+      const result = await orderCollection.insertOne(order)
+      res.send(result)
+    })
+    // get all order
+    app.get('/order' ,async(req,res)=>{
+      const query ={}
+      const cursor = orderCollection.find(query)
+      const ordersAll = await cursor.toArray()
+      res.send(ordersAll)
+     })
+    //  get order by email
+     app.get('/order/:email' ,async(req , res)=>{
+      const email = req.query.email
+      console.log(email)
+      const query ={email:email}
+      const cursor = orderCollection.find(query)
+      const orderEmail = await cursor.toArray()
+      res.send(orderEmail)
+      })
      // post review part start
      app.post('/review' ,async(req,res)=>{
       const tools = req.body
@@ -124,6 +156,35 @@ async function run(){
         res.send({admin:isAdmin})
 
       })
+      // purchase product
+      app.get('/tools/:id',async(req , res)=>{
+        const id = req.params.id
+        const query = {_id:ObjectId(id)}
+        const tools = await toolsCollection.findOne(query)
+        res.send(tools)
+    })
+       // put quantity
+       app.put( '/tools/:id' , async(req , res)=>{
+        const id = req.params.id 
+        const quantityIncrease = req.body
+        // console.log(quantityIncrease)
+        // res.send(quantityIncrease.quantity)
+        const filter = {_id: ObjectId(id)}
+        const options = {upsert :true}
+        // res.send(filter)
+        const updateDoc ={
+            $set:{
+              minimumQuantity:quantityIncrease.quantity
+                // quantityIncrease
+            }
+        }
+        
+        const result = await toolsCollection .updateOne(filter,updateDoc , options)
+        // console.dir(result)
+        res.send(result)
+        
+    })
+
 
     }
     finally{
