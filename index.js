@@ -130,13 +130,13 @@ async function run(){
     //   res.send({clientSecret: paymentIntent.client_secret})
     // });
      // post review part start
-     app.post('/review', verifyJwt ,async(req,res)=>{
+     app.post('/review',async(req,res)=>{
       const tools = req.body
       const result = await reviewCollection .insertOne(tools)
       res.send(result)
     })
     // get review
-      app.get('/review', verifyJwt  ,async(req,res)=>{
+      app.get('/review',async(req,res)=>{
       const query ={}
       const cursor = reviewCollection.find(query)
       const review = await cursor.toArray()
@@ -184,7 +184,7 @@ async function run(){
 
       })
       // purchase product
-      app.get('/tools/:id', verifyJwt , async(req , res)=>{
+      app.get('/tools/:id',  async(req , res)=>{
         const id = req.params.id
         const query = {_id:ObjectId(id)}
         const tools = await toolsCollection.findOne(query)
