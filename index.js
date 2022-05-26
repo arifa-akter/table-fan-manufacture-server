@@ -110,7 +110,7 @@ async function run(){
       res.send(orderEmail)
       })
     // get order payment by id 
-    app.get('/orderPayment/:id',verifyJwt ,async(req ,res)=>{
+    app.get('/orderPayment/:id' ,async(req ,res)=>{
       const id = req.params.id;
       const query ={_id: ObjectId(id)}
       const orderPayment = await orderCollection.findOne(query)
